@@ -24,7 +24,7 @@
       {
         default = pkgs.mkShell {
           packages = [
-            crossPkgs.buildPackages.gccWithoutTargetLibc
+            crossPkgs.buildPackages.gccWithoutLibc
             # crossPkgs.buildPackages.binutils-unwrapped
           ];
         };

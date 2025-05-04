@@ -4,6 +4,8 @@
 
 class Entity {
 public:
+    virtual int Kind() const { return 0; }
+
     Entity();
     virtual ~Entity();
     virtual void StartListening(Entity* other);

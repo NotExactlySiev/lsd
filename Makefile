@@ -1,7 +1,8 @@
 NAME	:= lsd
 
 # Replace these with the prefix for your compile tools.
-TGT 	:= mipsel-unknown-none-elf
+# TGT 	:= mipsel-unknown-none-elf
+TGT :=
 MKISO	:= mkpsxiso
 CC	:= $(TGT)-gcc
 OBJCOPY	:= $(TGT)-objcopy
@@ -15,11 +16,11 @@ INCDIRS	+= -Ipsyq/include
 #LIBS		+= -lc -lapi # etc
 
 # Required flags
-CCFLAGS	:= -Wall -march=r3000 -mno-abicalls -static -msoft-float -fno-builtin
+CCFLAGS	:= -Wall -fno-builtin -static #-march=r3000 -mno-abicalls -msoft-float
 LDFLAGS := -T ps-exe.ld -Wl,--oformat=elf32-littlemips #-nostartfiles
 
 # User Flags
-CCFLAGS	+= -g -O1 -flto -G0
+# CCFLAGS	+= -g -O1 -flto -G0
 LDFLAGS += -Wl,-Map=build/$(NAME).map
 
 BUILD	:= build
@@ -28,7 +29,7 @@ BUILD	:= build
 all: $(BUILD) $(BUILD)/$(NAME).exe
 .PHONY: all
 
-build/$(NAME).elf: src/main.cc src/entity.cc src/list.cc src/pad.cc src/biggrand.cc
+build/$(NAME).elf: src/main.cc src/entity.cc src/list.cc src/pad.cc src/object.cc
 	$(CC) $(INCDIRS) $(CCFLAGS) $(LIBDIRS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 $(BUILD)/$(NAME).exe: $(BUILD)/$(NAME).elf
