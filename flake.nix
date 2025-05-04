@@ -1,8 +1,6 @@
 {
   description = "Minimal PSX Development Environment";
 
-  # TODO: add my super awesome Nix build of PCSX-Redux
-
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   };
