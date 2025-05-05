@@ -16,15 +16,19 @@
         pkgs = import nixpkgs {
           localSystem = { inherit system; };
         };
+        /*
         crossPkgs = import nixpkgs {
           localSystem = { inherit system; };
           crossSystem = { system = "mipsel-none-elf"; };
         };
+        */
+        crossPkgs = pkgs.pkgsCross.mips-embedded;
       in
       {
         default = pkgs.mkShell {
           packages = [
-            crossPkgs.buildPackages.gccWithoutLibc
+            # crossPkgs.gccWithoutLibc
+            crossPkgs.buildPackages.gcc
             # crossPkgs.buildPackages.binutils-unwrapped
           ];
         };

@@ -29,7 +29,7 @@ BUILD	:= build
 all: $(BUILD) $(BUILD)/$(NAME).exe
 .PHONY: all
 
-build/$(NAME).elf: src/main.cc src/entity.cc src/list.cc src/pad.cc src/object.cc
+build/$(NAME).elf: src/main.cc src/entity.cc src/list.cc src/pad.cc src/object.cc src/gpu.cc
 	$(CC) $(INCDIRS) $(CCFLAGS) $(LIBDIRS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 $(BUILD)/$(NAME).exe: $(BUILD)/$(NAME).elf

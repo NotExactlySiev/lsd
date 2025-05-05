@@ -31,6 +31,7 @@ Object::~Object() {
 void Object::ReceiveEvent(Entity* sender, int event) {
     Entity::ReceiveEvent(sender, event);
     switch (sender->Kind()) {
+        // TODO
         case 2: break;
         case 4: break;
         case 5: break;
@@ -105,4 +106,20 @@ void Object::IterateChildren(Object*& ptr, List<Entity>::Node*& rest) {
             return;
         }
     }
+}
+
+//
+//
+
+void Object::MakeRotationMatrix(MATRIX* out, bool flip) {
+    SVECTOR rotation;
+    SVECTOR& param = m_Obj.coord2->param->rotate;
+    if (flip) {
+        rotation.vx = -param.vx;
+        rotation.vy = -param.vy;
+        rotation.vz = -param.vz;
+    } else {
+        rotation = param;
+    }
+    RotMatrix(&rotation, out);
 }

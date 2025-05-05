@@ -1,10 +1,6 @@
 
 #include "pad.hh"
 
-void PadInit(int mode);
-void PadStop();
-unsigned int PadRead(int);
-
 Pad::Pad(int mode, int id) : Entity() {
     if (s_UserCount++ == 0) {
         PadInit(mode);

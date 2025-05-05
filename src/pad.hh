@@ -1,4 +1,8 @@
+#pragma once
 #include "entity.hh"
+extern "C" {
+#include <libetc.h>
+}
 
 class Pad : Entity {
 public:

@@ -1,3 +1,4 @@
+#pragma once
 #include "list.hh"
 
 // TODO: event enums
@@ -21,9 +22,9 @@ public:
     virtual void Broadcast(int event);
     virtual void Nothing();
     virtual void ReceiveEvent(Entity* sender, int event);
-    virtual void Unknown() = 0;
+    //virtual void Unknown() = 0;
 
-protected: 
+protected:
     List<Entity> m_Listeners;
     List<Entity> m_Listening;
 };
