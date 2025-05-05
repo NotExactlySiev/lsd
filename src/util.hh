@@ -23,3 +23,16 @@ void Area2DToRECT(RECT* dst, Area2D* src) {
 struct Color {
     u_char r, g, b;
 };
+
+// this might be the funniest thing I've ever seen
+static unsigned long SetBitfield(unsigned long& bitfield, uint position, uint length, uint value) {
+  position &= 32 - 1;
+  uint mask = 1;
+  for (int i = 0; i < length; i++)
+      mask = mask << 1;
+
+  mask = (mask - 1) << position;
+  uint oldValue = (bitfield & mask) >> position;
+  bitfield = (bitfield & ~mask) | (value << position);
+  return oldValue;
+}
