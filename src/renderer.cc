@@ -10,7 +10,7 @@ Renderer::Renderer() : Entity() {
 }
 
 Renderer::~Renderer() {
-    Func20();
+    Deallocate();
     Detatch();
     delete m_Obj;
     Func26(0);
@@ -139,7 +139,114 @@ void Renderer::Detatch() {
 
 //
 
+
+
 void Renderer::DoNothing2() {}
 void Renderer::DoNothing3() {}
 
+void Renderer::Allocate() {
+    if (!m_Allocated) {
+        // TODO: is this formula from libgs?
+        size_t workSize = m_PrimBucketSize * m_PrimBucketCount;
+        size_t otSize = (1 << m_OtPower) * sizeof(u_long);
+        size_t bufferSize = sizeof(GsOT) + otSize + workSize;
+        void* buffer = new char[2 * bufferSize];
+        if (buffer == nullptr)
+            return;
+        
+        m_OtHead[0] = (GsOT*) buffer;
+        m_Ot[0] = buffer + sizeof(GsOT);
+        m_WorkArea[0] = buffer + sizeof(GsOT) + otSize;
+
+        m_OtHead[1] = (GsOT*) (buffer + bufferSize);
+        m_Ot[1] = buffer + bufferSize + sizeof(GsOT);
+        m_WorkArea[1] = buffer + bufferSize + sizeof(GsOT) + otSize;
+
+        m_OtHead[0]->length = m_OtPower;
+        m_OtHead[0]->org = (GsOT_TAG*) m_Ot[0];
+        m_OtHead[1]->length = m_OtPower;
+        m_OtHead[0]->org = (GsOT_TAG*) m_Ot[1];
+        GsClearOt(0, 0, m_OtHead[0]);
+        GsClearOt(0, 0, m_OtHead[1]);
+        m_Allocated = true;
+        m_BufferIndex = 0;
+    }
+}
+
+void Renderer::Deallocate() {
+    if (m_Allocated) {
+        DrawSync(0);
+        delete m_OtHead[0];
+        m_Allocated = false;
+    }
+}
+
+void Renderer::On5Event(Entity* sender, int event) {
+    m_Ev5Counter++;
+    if (event - 2U < 2) {
+        Func23();
+    }
+}
+
+void Renderer::OnGpuEvent(GPU* sender, int event) {
+    if (event == 2) {
+        DrawAndSwap();
+    }
+}
+
+void Renderer::Func23() {
+    if (m_Allocated) {
+        if (m_Super->m_Super) {
+            Func24DrawObject(m_Super);
+        }
+        GsSetProjection(m_Projection);
+        // TODO: where the fuck is GsSetNearClip???
+        GsSetLightMode(m_LightMode);
+        if (m_LightMode == 1 || m_LightMode == 3) {
+            ::SetFarColor(m_FarColor.r, m_FarColor.g, m_FarColor.b);
+            ::SetFogNear(m_FogNear, m_Projection);
+        }
+        GsSetRefView2(&m_Refview);
+        m_Refview.super->flg = 0;
+        m_DepthThing = (m_FarClip - m_NearClip) / (1 << m_OtPower) + 1;
+        GsSetWorkBase((PACKET*) m_WorkArea[m_BufferIndex]);
+        GsClearOt(0, 0, m_OtHead[m_BufferIndex]);
+        Func24DrawObject(m_Obj);
+        if (m_Super) {
+            Func24DrawObject(GetRoot(m_Super));
+        }
+    }
+}
+
+void Renderer::DrawAndSwap() {
+    if (!m_Allocated)
+        return;
+    
+    m_BufferIndex = m_Gpu->GetActiveBuff();
+    if (m_Drawing) {
+        ResetGraph(1);
+        m_Gpu->Swap();
+        if (m_Unk9 && m_BufferIndex == 0) {
+            m_Gpu->Swap();
+        }
+        GsSortClear(m_Color.r, m_Color.g, m_Color.b, m_OtHead[m_BufferIndex]);
+        GsDrawOt(m_OtHead[m_BufferIndex]);
+        if (m_Unk9 && m_BufferIndex == 0) {
+            m_Gpu->Swap();
+        }
+    }
+    m_BufferIndex = !m_BufferIndex;
+}
+
 //
+
+void Renderer::SetDrawingEnable(bool enabled) {
+    m_Drawing = enabled;
+}
+
+Object* Renderer::GetRoot(Object* obj) {
+    while (obj->m_Super) {
+        obj = obj->m_Super;
+    }
+    return obj;
+}

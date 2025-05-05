@@ -37,18 +37,19 @@ public:
     /* 16 */ virtual void SetRefviewZ();
     /* 17 */ virtual void DoNothing2();
     /* 18 */ virtual void DoNothing3();
-    /* 19 */ virtual void AllocateMemory();
-    /* 20 */ virtual void Func20();
+    /* 19 */ virtual void Allocate();
+    /* 20 */ virtual void Deallocate();
     /* 21 */ virtual void On5Event(Entity* sender, int event);
     /* 22 */ virtual void OnGpuEvent(GPU* sender, int event);
     /* 23 */ virtual void Func23();
-    /* 24 */ virtual void Func24DrawObject();
+    /* 24 */ virtual void Func24DrawObject(Object* obj);
     /* 25 */ virtual void DrawAndSwap();
     /* 26 */ virtual void Func26(int);
     /* 27 */ virtual void Func27();
     /* 28 */ virtual void Func28();
-    /* 29 */ virtual void SetDrawingEnable();
+    /* 29 */ virtual void SetDrawingEnable(bool enabled);
 
+    static Object* GetRoot(Object* obj);
 
 private:
     GPU* m_Gpu;
@@ -72,8 +73,9 @@ private:
     int m_Unk2;
     int m_Allocated;
     int m_BufferIndex;
-    GsOT* m_Ots[2];
-    void* m_WorkAreas[2][2];
+    GsOT* m_OtHead[2];
+    void* m_Ot[2];
+    void* m_WorkArea[2];
     int m_Ev5Counter;
     int m_Unk3;
     uint m_DepthThing;
@@ -82,7 +84,7 @@ private:
     int m_Unk6;
     int m_Unk7;
     Object* m_Obj;
-    //
-    //
+    void* m_Unk8;
+    int m_Unk9; // bool?
     bool m_Drawing;
 };
