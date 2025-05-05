@@ -6,12 +6,12 @@ extern "C" {
 #include <libgte.h>
 }
 
-class Object : Entity {
+class Object : public Entity {
 public:
     virtual int Kind() const override { return 4; }
 
     // loads of functions
-    Object(int);  // arg?
+    Object();
     // TODO 6 overrides
     virtual void ReceiveEvent(Entity* sender, int event) override;
 

@@ -5,8 +5,10 @@ extern "C" {
 #include "libgte.h"
 }
 
-class GPU : Entity {
+class GPU : public Entity {
 public:
+    virtual int Kind() const { return 1; }
+
     GPU();
     /*  0 */ virtual void PreInit();
     /*  1 */ virtual void Init(Rect2D* screen, int vramMode);

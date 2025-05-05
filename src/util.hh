@@ -19,3 +19,7 @@ void Area2DToRECT(RECT* dst, Area2D* src) {
     dst->w = src->rect.w;
     dst->h = src->rect.h;
 }
+
+struct Color {
+    u_char r, g, b;
+};

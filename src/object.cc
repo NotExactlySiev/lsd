@@ -9,7 +9,7 @@ struct Point {
     }
 };
 
-Object::Object(int arg) : Entity() {
+Object::Object() : Entity() {
     m_Obj.coord2 = new GsCOORDINATE2;
     m_Obj.coord2->param = new GsCOORD2PARAM;
     unk4 = 0;
