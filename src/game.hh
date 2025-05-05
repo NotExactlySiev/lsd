@@ -11,8 +11,9 @@ struct GameConfig {
 };
 
 class Game : Parent {
-    GameConfig* m_Config;
 public:
+    virtual int Kind() const override { return 0x1F60; }
+
     Game(GameConfig* config);
     virtual void PreInit();
     virtual void Init(GPU* gpu, Pad* pad);
@@ -22,4 +23,7 @@ public:
     virtual void Func3();
     virtual bool Func4();
     virtual void Func5();
+
+private:
+    GameConfig* m_Config;
 };

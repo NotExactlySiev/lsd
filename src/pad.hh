@@ -6,6 +6,8 @@ extern "C" {
 
 class Pad : Entity {
 public:
+    virtual int Kind() const override { return 0x2; }
+
     Pad(int mode, int id);
     virtual ~Pad();
     virtual void Init(int id);

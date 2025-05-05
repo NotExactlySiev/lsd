@@ -2,11 +2,9 @@
 #include "entity.hh"
 
 class Counter : Entity {
-    int m_Value;
-    bool m_Paused;
-    bool m_Stopped;
-    List<Entity>::Node* m_WorkingList;    // Iterator
 public:
+    virtual int Kind() const override { return 0x5; }
+    
     Counter();
     virtual ~Counter();
     virtual void RemoveListener(Entity* other) override;
@@ -18,4 +16,10 @@ public:
     virtual void Unpause();
     virtual bool IsPaused();
     virtual void Stop();
+
+private:
+    int m_Value;
+    bool m_Paused;
+    bool m_Stopped;
+    List<Entity>::Node* m_WorkingList;    // Iterator
 };

@@ -9,7 +9,7 @@ extern "C" {
 
 class Renderer : Entity {
 public:
-    virtual int Kind() const { return 0x7; }
+    virtual int Kind() const override { return 0x7; }
 
     Renderer();
     virtual ~Renderer();
@@ -42,7 +42,7 @@ public:
     /* 21 */ virtual void On5Event(Entity* sender, int event);
     /* 22 */ virtual void OnGpuEvent(GPU* sender, int event);
     /* 23 */ virtual void Func23();
-    /* 24 */ virtual void Func24DrawObject(Object* obj);
+    /* 24 */ virtual void RenderObject(Object* obj);
     /* 25 */ virtual void DrawAndSwap();
     /* 26 */ virtual void Func26(int);
     /* 27 */ virtual void Func27();

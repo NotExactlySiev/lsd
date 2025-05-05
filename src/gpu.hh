@@ -7,7 +7,7 @@ extern "C" {
 
 class GPU : public Entity {
 public:
-    virtual int Kind() const { return 1; }
+    virtual int Kind() const { return 0x1; }
 
     GPU();
     /*  0 */ virtual void PreInit();

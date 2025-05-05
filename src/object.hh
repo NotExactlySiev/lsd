@@ -8,7 +8,7 @@ extern "C" {
 
 class Object : public Entity {
 public:
-    virtual int Kind() const override { return 4; }
+    virtual int Kind() const override { return 0x4; }
 
     Object();
     virtual void StartListening(Entity* other) override;

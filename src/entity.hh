@@ -5,7 +5,7 @@
 
 class Entity {
 public:
-    virtual int Kind() const { return 0; }
+    virtual int Kind() const { return 0x0; }
 
     Entity();
     virtual ~Entity();

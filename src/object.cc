@@ -155,6 +155,7 @@ void Object::IterateChildren(Object*& ptr, List<Entity>::Node*& rest) {
             rest = m_Listening.m_Head;
         }
         List<Entity>::Iterate(p, rest);
+        // TODO: is this basically just a dynamic cast?
         if (p && p->Kind() == 4 && static_cast<Object*>(p)->m_Super == this) {
                 ptr = static_cast<Object*>(p);
                 break;
