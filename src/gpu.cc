@@ -125,7 +125,6 @@ void GPU::SetCallback(void (*callback)()) {
     m_Callback = callback;
 }
 
-
 void GPU::SetGPU(GPU* gpu) {
     s_Global = gpu;
 }

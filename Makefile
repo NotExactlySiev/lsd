@@ -12,7 +12,7 @@ LIBS	:=
 
 INCDIRS	+= -Ipsyq/include
 LIBDIRS	+= -Lpsyq/libs
-LIBS	+= -lc2 -lapi # etc
+LIBS	+= -lgs -lgpu -lgte -letc -lc2 -lapi # etc
 
 # Required flags
 CCFLAGS	:= -Wall -fno-builtin -nostdinc -nostdlib -static -mips1 -march=r3000 -mno-abicalls -msoft-float -fno-pic
@@ -29,7 +29,6 @@ all: $(BUILD) $(BUILD)/$(NAME).exe
 .PHONY: all
 
 build/$(NAME).elf: src/main.cc \
-				   src/entity.cc \
 				   src/pad.cc \
 				   src/object.cc \
 				   src/gpu.cc \
@@ -37,7 +36,9 @@ build/$(NAME).elf: src/main.cc \
 				   src/modelset.cc \
 				   src/model.cc \
 				   src/util.cc \
+				   src/entity.cc \
 				   src/list.cc \
+				   src/memory.cc \
 				   src/crt0.s
 	$(CC) $(INCDIRS) $(CCFLAGS) $(LIBDIRS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
