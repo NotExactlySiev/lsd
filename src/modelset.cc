@@ -18,7 +18,7 @@ ModelSet::ModelSet(Params* params) : File() {
 
 ModelSet::~ModelSet() {
     for (Model** p = m_Models; *p; p++) {
-        delete p;
+        delete *p;
     }
     delete m_Models;
     File::~File();
@@ -31,7 +31,7 @@ void ModelSet::MapData() {
 }
 
 void* ModelSet::GetModelData(int index) {
-    return m_Buffer + 12 + 28 * index;
+    return ((char*) m_Buffer) + 12 + 28 * index;
 }
 
 Model* ModelSet::GetModel(int index) {

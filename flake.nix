@@ -35,6 +35,7 @@
 
           buildInputs = [
             pkgs.SDL2
+            pkgs.openal
           ];
         };
       });

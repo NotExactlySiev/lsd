@@ -4,7 +4,7 @@ NAME	:= lsd
 # TGT 	:= mipsel-unknown-none-elf
 TGT :=
 MKISO	:= mkpsxiso
-CC	:= $(TGT)g++
+CC	:= $(TGT)-gcc
 OBJCOPY	:= $(TGT)-objcopy
 
 INCDIRS	:=
@@ -16,8 +16,8 @@ INCDIRS	+= -Ipsyq/include
 #LIBS		+= -lc -lapi # etc
 
 # Required flags
-CCFLAGS	:= -Wall -fno-builtin #-static -march=r3000 -mno-abicalls -msoft-float
-#LDFLAGS := -T ps-exe.ld -Wl,--oformat=elf32-littlemips #-nostartfiles
+CCFLAGS	:= -Wall -fno-builtin -static #-march=r3000 -mno-abicalls -msoft-float
+LDFLAGS := -T ps-exe.ld -Wl,--oformat=elf32-littlemips #-nostartfiles
 
 # User Flags
 # CCFLAGS	+= -g -O1 -flto -G0
@@ -26,17 +26,23 @@ LDFLAGS += -Wl,-Map=build/$(NAME).map
 BUILD	:= build
 
 # Build a single executable or a disc image.
-all: $(BUILD) $(BUILD)/$(NAME)
+all: $(BUILD) $(BUILD)/$(NAME).exe
 .PHONY: all
 
-build/$(NAME): src/main.cc src/entity.cc src/list.cc src/pad.cc src/object.cc src/gpu.cc src/renderer.cc
+build/$(NAME).elf: src/main.cc \
+				   src/entity.cc \
+				   src/pad.cc \
+				   src/object.cc \
+				   src/gpu.cc \
+				   src/renderer.cc \
+				   src/modelset.cc \
+				   src/model.cc \
+				   src/util.cc \
+				   src/list.cc
 	$(CC) $(INCDIRS) $(CCFLAGS) $(LIBDIRS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-#$(BUILD)/%.o: src/%.c
-#	$(CC) -c $(INCDIRS) $(CCFLAGS) -o $@ $^
-
-#$(BUILD)/$(NAME).exe: $(BUILD)/$(NAME).elf
-#	$(OBJCOPY) -O binary $^ $@
+$(BUILD)/$(NAME).exe: $(BUILD)/$(NAME).elf
+	$(OBJCOPY) -O binary $^ $@
 
 # In case you wanna embed any files into the binary.
 $(BUILD)/%.elf: bin/%.*

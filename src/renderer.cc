@@ -150,7 +150,7 @@ void Renderer::Allocate() {
         size_t workSize = m_PrimBucketSize * m_PrimBucketCount;
         size_t otSize = (1 << m_OtPower) * sizeof(u_long);
         size_t bufferSize = sizeof(GsOT) + otSize + workSize;
-        void* buffer = new char[2 * bufferSize];
+        char* buffer = new char[2 * bufferSize];
         if (buffer == nullptr)
             return;
         

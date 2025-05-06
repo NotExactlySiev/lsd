@@ -22,13 +22,13 @@ Object::~Object() {
 
 void Object::StartListening(Entity* other) {
     Entity::StartListening(other);
-    if (other->Kind() & 0xf == 9) {
+    if ((other->Kind() & 0xf) == 0x9) {
         SetModel(static_cast<Model*>(other));
     }
 }
 
 void Object::StopListening(Entity* other) {
-    if (other->Kind() & 0xf == 9) {
+    if ((other->Kind() & 0xf) == 0x9) {
         ResetModel();
     }
     Entity::StopListening(other);
