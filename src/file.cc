@@ -2,13 +2,13 @@
 
 //
 File::File() : Entity() {
-    m_Found = false;
+    m_Open = false;
     m_Buffer = nullptr;
     m_Size = 0;
     m_Unk0 = 0;
     m_CmdCount = 0;
     m_Flags = 0;
-    m_Unk1 = 0;
+    m_DoItNow = 0;
     m_Unk2 = 0;
 }
 
@@ -21,8 +21,8 @@ void File::ReadAll(char *fileName) {
     if (m_Buffer)
         return;
     
-    bool found = m_Found;
-    m_Found = false;
+    bool found = m_Open;
+    m_Open = false;
     Open(fileName, 1, 0);
     int size = GetSize(0, 2);
     void* buf = new char[size];
@@ -37,7 +37,7 @@ void File::ReadAll(char *fileName) {
     Close();
     m_Buffer = buf;
     m_Size = size;
-    m_Found = found;
+    m_Open = found;
 }
 
 void File::FreeBuffer() {
@@ -52,3 +52,30 @@ void File::DoNothing0() {}
 void File::SetFlag() {
     m_Flags |= 1;
 }
+
+// vt fuckery here
+// also ModelSetParam ctor for some reason?
+
+//void File::Lock() {}
+//void File::Unlock() {}
+
+// unused stuff
+
+//void File::SetOptions() {}
+
+//
+
+void File::AdvanceArray(int n) {
+    // TODO
+}
+
+
+void File::SetCurrDir(char* dir) {
+    s_CurrDir = dir;
+}
+
+char* File::GetCurrDir() {
+    return s_CurrDir;
+}
+
+//

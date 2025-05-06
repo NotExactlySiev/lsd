@@ -9,7 +9,7 @@ public:
     virtual ~CDFile() noexcept;
     
     /*  0 */ virtual void Init() override;
-    /*  1 */ virtual void Open(char* filename, int, int) override;
+    /*  1 */ virtual void Open(char* filename, int arg0, int arg1) override;
     /*  2 */ virtual void Close() override;
     /*  3 */ virtual int GetSize(int, int) override; // Stat?
     /*  4 */ virtual void Func4() override;
@@ -27,11 +27,17 @@ public:
     static bool SetOptions(int option0, int option1, int option2);
 
 private:
+    void SimpleOpen(char* fileName);
+    static char* MakeFullAddr(char* dst, char* fileName);
+    void SimpleClose();
+    int SimpleSize();
+    int SimpleRead(void* buffer, uint size);
+
     static void Lock();
     static void Unlock();
     
     struct Command;
-    static Command* s_Queue;
+    
     
     struct Command {
         // I don't think these two functions were ctor/dtor in the original.
@@ -57,12 +63,38 @@ private:
     static void StartRunning();
     void IssueCommand(int fileIndex, int cmd, int arg0, int arg1);
 
-    static bool s_Lock;
+    
+    //
     static bool s_ModeSet;
     static int s_Option0;
     static int s_Option1;
     static bool s_SomeCheck;
+    // s_FilesArray
+    static int s_CurrIndex;
+    static int s_LetSecondaryEnd;
+    static int s_Unused0;
+    static int s_PrimaryStep;
+    // curr file from array
+    static int s_CurrSectorCount;
+    static void* s_CurrBuffer;
     //
+    static bool s_Lock;
+    static int s_RunningQueue;
+    static Command* s_Queue;
+    static int s_PrimaryCommand;
+    static int s_Unused1;
+    static int s_PrimaryCounter;
     static int s_Option2;
-    
+
+
+    // unordered
+    // GetFile
+    static int GetFileIndex(char*);
+    // GetFile
+    // GetFile
+    static void RunPrimary1();
+    static void RunPrimary2();
+    static void SetPrimaryStatus(int, int);
+    static void StopAll();
+    static void SetPrimaryState(int, int);    
 };

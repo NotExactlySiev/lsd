@@ -2,7 +2,7 @@
 #include "entity.hh"
 #include "util.hh"
 extern "C" {
-#include "libgte.h"
+#include <libgte.h>
 }
 
 class GPU : public Entity {

@@ -35,6 +35,8 @@ build/$(NAME).elf: src/main.cc \
 				   src/renderer.cc \
 				   src/modelset.cc \
 				   src/model.cc \
+				   src/cdfile.cc \
+				   src/file.cc \
 				   src/util.cc \
 				   src/entity.cc \
 				   src/list.cc \

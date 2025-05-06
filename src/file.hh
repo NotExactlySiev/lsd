@@ -35,17 +35,27 @@ public:
     /* 12 */ virtual void Func12() = 0;
     /* 13 */ virtual void Func13() = 0;
 
+    //
+    static void AdvanceArray(int n);
+    static void SetCurrDir(char* dir);
+    static char* GetCurrDir();
+    // some string function
+    
 protected:
-    bool m_Found;
+    bool m_Open;
     void* m_Buffer;
     int m_Size;
     
     // it appears that this really does have the CD fields. which is weird.
     CdlLOC m_Pos;
-    int m_DiscSize;
+    uint m_DiscSize;
     short m_Unk0;
     short m_CmdCount;
     int m_Flags;
-    short m_Unk1;
-    short m_Unk2;
+    short m_DoItNow;
+    short m_Unk2;   // padding?
+
+private:
+    static char* s_CurrDir;
+
 };

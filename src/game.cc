@@ -2,7 +2,7 @@
 
 Game::Game(GameConfig *config) : Parent(config->code) {
     m_Config = config;
-    // set_curr_dir
+    //File::SetCurrDir();
     //
     //
     // TODO loads of shit here
