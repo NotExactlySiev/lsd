@@ -27,9 +27,14 @@
       {
         default = pkgs.mkShell {
           packages = [
+
             # crossPkgs.gccWithoutLibc
-            crossPkgs.buildPackages.gcc
+            # crossPkgs.buildPackages.gcc
             # crossPkgs.buildPackages.binutils-unwrapped
+          ];
+
+          buildInputs = [
+            pkgs.SDL2
           ];
         };
       });

@@ -54,6 +54,16 @@ void Entity::IterateListener(Entity*& ptr, List<Entity>::Node*& rest) {
     List<Entity>::Iterate(ptr, rest);
 }
 
+void Entity::Broadcast(int event) {
+    Entity* listener;
+    List<Entity>::Node* ctx;
+
+    ctx = m_Listeners.m_Head;
+    while (List<Entity>::Iterate(listener, ctx), listener) {
+        listener->ReceiveEvent(this, event);
+    }
+}
+
 void Entity::Nothing() {}
 
 void Entity::ReceiveEvent(Entity* sender, int event) {

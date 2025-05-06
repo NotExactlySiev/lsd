@@ -6,6 +6,16 @@ extern "C" {
 #include <libgte.h>
 }
 
+struct Point {
+    short x, y;
+
+    int What() {
+        // huh.
+        return ((x / y) * 4096) + ((x % y) * 4096) / y;
+    }
+};
+
+
 class Object : public Entity {
 public:
     virtual int Kind() const override { return 0x4; }

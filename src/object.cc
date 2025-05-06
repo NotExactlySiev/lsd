@@ -1,15 +1,6 @@
 #include "object.hh"
 #include "util.hh"
 
-struct Point {
-    short x, y;
-
-    int What() {
-        // huh.
-        return ((x / y) * 4096) + ((x % y) * 4096) / y;
-    }
-};
-
 Object::Object() : Entity() {
     m_Obj.coord2 = new GsCOORDINATE2;
     m_Obj.coord2->param = new GsCOORD2PARAM;

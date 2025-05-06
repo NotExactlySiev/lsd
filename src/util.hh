@@ -13,7 +13,7 @@ struct Area2D {
 };
 
 // TODO: maybe this originally returned RECT as value?
-void Area2DToRECT(RECT* dst, Area2D* src) {
+static void Area2DToRECT(RECT* dst, Area2D* src) {
     dst->x = src->x;
     dst->y = src->y;
     dst->w = src->rect.w;
