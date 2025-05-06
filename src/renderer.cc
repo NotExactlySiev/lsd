@@ -197,7 +197,7 @@ void Renderer::OnGpuEvent(GPU* sender, int event) {
 void Renderer::Func23() {
     if (m_Allocated) {
         if (m_Super->m_Super) {
-            Func24DrawObject(m_Super);
+            RenderObject(m_Super);
         }
         GsSetProjection(m_Projection);
         // TODO: where the fuck is GsSetNearClip???
@@ -211,9 +211,9 @@ void Renderer::Func23() {
         m_DepthThing = (m_FarClip - m_NearClip) / (1 << m_OtPower) + 1;
         GsSetWorkBase((PACKET*) m_WorkArea[m_BufferIndex]);
         GsClearOt(0, 0, m_OtHead[m_BufferIndex]);
-        Func24DrawObject(m_Obj);
+        RenderObject(m_Obj);
         if (m_Super) {
-            Func24DrawObject(GetRoot(m_Super));
+            RenderObject(GetRoot(m_Super));
         }
     }
 }

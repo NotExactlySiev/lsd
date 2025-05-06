@@ -1,7 +1,9 @@
+#pragma once
 #include "entity.hh"
 extern "C" {
 #include <libgte.h>
 }
+
 // TODO
 class Model : public Entity {
 public:

@@ -31,7 +31,7 @@ public:
     /*  8 */ virtual void DoNothing0();
     /*  9 */ virtual void SetFlag();
     /* 10 */ virtual void Func10() = 0;
-    /* 11 */ virtual void Func11() = 0;
+    /* 11 */ virtual void Func11(char* fileName) = 0;
     /* 12 */ virtual void Func12() = 0;
     /* 13 */ virtual void Func13() = 0;
 
