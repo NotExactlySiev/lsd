@@ -1,4 +1,5 @@
 #include "cdfile.hh"
+#include "gpu.hh"
 
 CDFile::CDFile() : File() {
     m_Unk1 = 0;
@@ -23,6 +24,45 @@ void CDFile::SetFastMode() {
         while (0 == CdControlB(CdlSetmode, param, nullptr));
         s_ModeSet = true;
     }
+}
+
+// unused here
+
+bool CDFile::SetOptions(int option0, int option1, int option2) {
+    if (s_SomeCheck)
+        return false;
+
+/*
+    if (option2 == 0) {
+        GPU* gpu = GPU::GetGlobal();
+        if (s_Option0) {
+            if (option0) {
+                s_Option0 = option0;
+                s_Option1 = option1;
+                s_Option2 = option2;
+                return true;
+            }
+            gpu->SetCallback(nullptr);
+
+        } else {
+            if (!option0) {
+                s_Option0 = option0;
+                s_Option1 = option1;
+                s_Option2 = option2;
+                return true;
+            }
+            gpu->SetCallback(Callback);
+        }
+    }
+*/
+    if (option2 == 0 && option0 != s_Option0) {
+        GPU::GetGlobal()->SetCallback(s_Option0 ? nullptr : Callback);
+    }
+
+    s_Option0 = option0;    // no callback
+    s_Option1 = option1;
+    s_Option2 = option2;
+    return true;
 }
 
 //

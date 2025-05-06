@@ -19,11 +19,12 @@ public:
     /*  8 */ virtual void Nothing0();
     /*  9 */ virtual void SetFlag();
     /* 10 */ virtual void Func10() override;    // static?
-    /* 11 */ virtual void Func11() override;
+    /* 11 */ virtual void Func11(char* fileName) override;
     /* 12 */ virtual void Func12() override;
     /* 13 */ virtual void Func13() override;
 
     static void SetFastMode();
+    static bool SetOptions(int option0, int option1, int option2);
 
 private:
     static void Lock();
@@ -58,4 +59,10 @@ private:
 
     static bool s_Lock;
     static bool s_ModeSet;
+    static int s_Option0;
+    static int s_Option1;
+    static bool s_SomeCheck;
+    //
+    static int s_Option2;
+    
 };

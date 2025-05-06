@@ -1,8 +1,7 @@
 NAME	:= lsd
 
 # Replace these with the prefix for your compile tools.
-# TGT 	:= mipsel-unknown-none-elf
-TGT :=
+TGT 	:= mipsel-unknown-linux-gnu
 MKISO	:= mkpsxiso
 CC	:= $(TGT)-gcc
 OBJCOPY	:= $(TGT)-objcopy
@@ -12,15 +11,15 @@ LIBDIRS	:=
 LIBS	:=
 
 INCDIRS	+= -Ipsyq/include
-#LIBDIRS	+= -Lpsyq/lib
-#LIBS		+= -lc -lapi # etc
+LIBDIRS	+= -Lpsyq/libs
+LIBS	+= -lc2 -lapi # etc
 
 # Required flags
-CCFLAGS	:= -Wall -fno-builtin -static #-march=r3000 -mno-abicalls -msoft-float
-LDFLAGS := -T ps-exe.ld -Wl,--oformat=elf32-littlemips #-nostartfiles
+CCFLAGS	:= -Wall -fno-builtin -nostdinc -nostdlib -static -mips1 -march=r3000 -mno-abicalls -msoft-float -fno-pic
+LDFLAGS := -T ps-exe.ld -Wl,--oformat=elf32-little #-nostartfiles
 
 # User Flags
-# CCFLAGS	+= -g -O1 -flto -G0
+CCFLAGS	+= -g -O1 -flto -G0
 LDFLAGS += -Wl,-Map=build/$(NAME).map
 
 BUILD	:= build
@@ -38,15 +37,16 @@ build/$(NAME).elf: src/main.cc \
 				   src/modelset.cc \
 				   src/model.cc \
 				   src/util.cc \
-				   src/list.cc
+				   src/list.cc \
+				   src/crt0.s
 	$(CC) $(INCDIRS) $(CCFLAGS) $(LIBDIRS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 $(BUILD)/$(NAME).exe: $(BUILD)/$(NAME).elf
-	$(OBJCOPY) -O binary $^ $@
+	$(OBJCOPY) -I elf32-little -O binary $^ $@
 
 # In case you wanna embed any files into the binary.
 $(BUILD)/%.elf: bin/%.*
-	$(OBJCOPY) -I binary -O elf32-littlemips $^ $@
+	$(OBJCOPY) -I binary -O elf32-little $^ $@
 
 $(BUILD):
 	mkdir -p $@
