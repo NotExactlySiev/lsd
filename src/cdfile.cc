@@ -40,13 +40,13 @@ void CDFile::Init() {}
 
 void CDFile::Open(char* filename, int arg0, int arg1) {
     if (!s_Option0 && !s_Option1) {
-        SimpleOpen(filename);
+        SimpleOpen(filename);   // dummy?
         return;
     }
 
     Lock();
-    if (!m_AllowBlocking) {   // allow blocking?
-        IssueCommand(GetFileIndex(filename), 2, arg0, arg1);
+    if (!m_AllowBlocking) {   // queue it if we can't block
+        IssueCommand(GetFileIndex(filename), Command::Code::Open, arg0, arg1);
         goto out;
     }
 
@@ -93,7 +93,7 @@ void CDFile::Close() {
     }
     Lock();
     if (!m_AllowBlocking) {
-        IssueCommand(0, 3, 0, 0);
+        IssueCommand(0, Command::Code::Close, 0, 0);
     } else if (!s_PrimaryRunning) {
         SetPrimaryStatus(0, 0);
         m_Open = false;
@@ -114,7 +114,7 @@ void CDFile::Read(void* dst, int size) {
     Lock();
 
     if (!m_AllowBlocking) {   // allow blocking?
-        IssueCommand(0, 5, (int) dst, size);
+        IssueCommand(0, Command::Code::Read, (int) dst, size);
         goto out;
     }
 
@@ -172,11 +172,11 @@ void CDFile::Func10() {
         if (file->m_CmdCount == 0)
             file->m_Flags |= 4;
         switch (s_Queue->m_Code) {
-            case 2: file->m_Flags |= 0x10; break;
-            case 3: file->m_Flags |= 0x20; break;
-            case 4: file->m_Flags |= 0x40; break;
-            case 5: file->m_Flags |= 0x80; break;
-            case 7: file->m_Flags |= 0x200; break;
+            case Command::Code::Open: file->m_Flags |= 0x10; break;
+            case Command::Code::Close: file->m_Flags |= 0x20; break;
+            case Command::Code::GetSize: file->m_Flags |= 0x40; break;
+            case Command::Code::Read: file->m_Flags |= 0x80; break;
+            case Command::Code::ReadAll: file->m_Flags |= 0x200; break;
         }
         file->SetFlag();
         delete s_Queue; // hidden control flow!
@@ -186,27 +186,27 @@ void CDFile::Func10() {
     } else {
         file->m_AllowBlocking = 1;
         switch (cmd->m_Code) {
-            case 2: {
+            case Command::Code::Open: {
                 FileAddr* addr = GetFromArray(cmd->m_FileIndex);
                 file->Open(addr->path, cmd->m_Unk1, cmd->m_Unk2);
             } break;
 
-            case 3: {
+            case Command::Code::Close: {
                 file->Close();
             } break;
 
-            case 4: {
+            case Command::Code::GetSize: {
                 file->GetSize(cmd->m_Unk1, cmd->m_Unk2);
             } break;
 
-            case 5: {
+            case Command::Code::Read: {
                 file->Read((void*) cmd->m_Unk1, cmd->m_Unk2);
             } break;
 
-            case 7: {
+            case Command::Code::ReadAll: {
                 FileAddr* addr = GetFromArray(cmd->m_FileIndex);
                 file->ReadAll(addr->path);
-            }
+            } break;
         }
         file->m_AllowBlocking = 0;
     }
@@ -219,7 +219,7 @@ void CDFile::Func11(char* fileName) {
     Lock();
     if (fileName) {
         if (s_Option0) {
-            IssueCommand(GetFileIndex(fileName), 7, 0, 0);
+            IssueCommand(GetFileIndex(fileName), Command::Code::ReadAll, 0, 0);
         } else {
             ReadAll(fileName);
             if (m_CmdCount == 0) {
@@ -310,9 +310,9 @@ void CDFile::StartRunningCommands() {
 // StopRunning
 
 // enqueue
-void CDFile::IssueCommand(int fileIndex, int cmd, int arg0, int arg1) {
+void CDFile::IssueCommand(int fileIndex, Command::Code code, int arg0, int arg1) {
     Command* command = new Command;
-    command->m_Code = cmd;
+    command->m_Code = code;
     command->m_Unk1 = arg0;
     command->m_File = this;
     command->m_FileIndex = fileIndex;

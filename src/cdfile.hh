@@ -52,9 +52,18 @@ private:
         explicit Command();
         ~Command();
 
+        enum Code {
+            Open = 2,
+            Close = 3,
+            GetSize = 4,
+            Read = 5,
+            ReadAll = 7,
+        };
+
         int m_Active;
         int m_Unk0;
-        int m_Code;
+        //int m_Code;
+        Code m_Code;
         CDFile* m_File;
         int m_FileIndex;
         int m_Unk1;
@@ -68,7 +77,7 @@ private:
     //
     //
     static void StartRunningCommands();
-    void IssueCommand(int fileIndex, int cmd, int arg0, int arg1);
+    void IssueCommand(int fileIndex, Command::Code cmd, int arg0, int arg1);
 
     
     //
@@ -103,5 +112,4 @@ private:
     static void SetPrimaryStatus(int, int);
     static void StopAll();  // call when successfully completed primary?
     static void SetPrimaryStep(int);
-    
 };
