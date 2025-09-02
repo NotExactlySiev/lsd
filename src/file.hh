@@ -52,7 +52,7 @@ protected:
     short m_Unk0;
     short m_CmdCount;
     int m_Flags;
-    short m_AllowBlocking;    // async, for this file only
+    short m_DontQueue;    // Actually Run
     short m_Unk2;   // padding?
 
 private:

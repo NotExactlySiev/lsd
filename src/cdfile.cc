@@ -7,8 +7,8 @@ extern "C" {
 }
 
 bool CDFile::s_ModeSet = false;
-int CDFile::s_Option0 = 0;
-int CDFile::s_Option1 = 0;
+int CDFile::s_NonBlocking = 0;
+int CDFile::s_UseQueue = 0;
 bool CDFile::s_PrimaryRunning = 0;
 int CDFile::s_CurrIndex = 0;
 int CDFile::s_LetSecondaryEnd = 1;
@@ -24,10 +24,10 @@ CDFile::Command* CDFile::s_Queue = nullptr;
 int CDFile::s_PrimaryCommand = 0;
 int CDFile::s_RunningCommands = 0;
 int CDFile::s_PrimaryCounter = 0;
-int CDFile::s_Option2 = 1;
+int CDFile::s_UseVsync = 1;
 
 CDFile::CDFile() : File() {
-    m_AllowBlocking = 0;
+    m_DontQueue = 0;
     SetFastMode();
 }
 
@@ -39,60 +39,60 @@ CDFile::~CDFile() {
 void CDFile::Init() {}
 
 void CDFile::Open(char* filename, int arg0, int arg1) {
-    if (!s_Option0 && !s_Option1) {
-        SimpleOpen(filename);   // dummy?
+    if (!s_NonBlocking && !s_UseQueue) {
+        // block
+        SimpleOpen(filename);
         return;
     }
 
     Lock();
-    if (!m_AllowBlocking) {   // queue it if we can't block
-        IssueCommand(GetFileIndex(filename), Command::Code::Open, arg0, arg1);
-        goto out;
-    }
+    if (m_DontQueue) {
+        // we're actually executing a queue'd operation. don't queue it again.
+        if (!s_PrimaryRunning && !m_Open) {
+            // basic checks passed. we can execute
+            if (s_NonBlocking) {
+                // async. start the coroutine
+                s_CurrAddr = GetFile(filename);
+                if (s_CurrAddr == nullptr)
+                    return;
+                m_Pos = s_CurrAddr->pos;
+                s_PrimaryCommand = 1;
+                m_Open = true;
+                m_DiscSize = s_CurrAddr->size;
+            } else {
+                // block
+                int rc;
+                char path[16];
+                CdlFILE file;
 
-    if (s_PrimaryRunning || m_Open) {
-        goto out;
-    }
+                SetPrimaryStatus(1, 1);
+                MakeFullAddr(path, filename);
+                while (CdSearchFile(&file, path) == nullptr);
+                m_Pos = file.pos;
+                m_DiscSize = file.size;
 
-    if (s_Option0) {
-        // async
-        s_CurrAddr = GetFile(filename);
-        if (s_CurrAddr == nullptr)
-            return;
-        m_Pos = s_CurrAddr->pos;
-        s_PrimaryCommand = 1;
-        m_Open = true;
-        m_DiscSize = s_CurrAddr->size;
+                do {
+                    CdControl(CdlSetloc, (u_char*) &m_Pos, nullptr);
+                    while ((rc = CdSync(0, nullptr)) == CdlNoIntr);
+                } while (rc == CdlDiskError);
+                m_Open = true;
+                StopAll();
+            }
+        }
     } else {
-        // block
-        int rc;
-        char path[16];
-        CdlFILE file;
-
-        SetPrimaryStatus(1, 1);
-        MakeFullAddr(path, filename);
-        while (CdSearchFile(&file, path) == nullptr);
-        m_Pos = file.pos;
-        m_DiscSize = file.size;
-
-        do {
-            CdControl(CdlSetloc, (u_char*) &m_Pos, nullptr);
-            while ((rc = CdSync(0, nullptr)) == CdlNoIntr);
-        } while (rc == CdlDiskError);
-        m_Open = true;
-        StopAll();
+        IssueCommand(GetFileIndex(filename), Command::Code::Open, arg0, arg1);
     }
-out:
     Unlock();
 }
 
 void CDFile::Close() {
-    if (!s_Option0 && !s_Option1) {
-        SimpleClose();
+    if (!s_NonBlocking && !s_UseQueue) {
+        SimpleClose();  // dummy?
         return;
     }
+
     Lock();
-    if (!m_AllowBlocking) {
+    if (!m_DontQueue) {
         IssueCommand(0, Command::Code::Close, 0, 0);
     } else if (!s_PrimaryRunning) {
         SetPrimaryStatus(0, 0);
@@ -106,14 +106,13 @@ void CDFile::Close() {
 //
 
 void CDFile::Read(void* dst, int size) {
-    if (!s_Option0 && !s_Option1) {
+    if (!s_NonBlocking && !s_UseQueue) {
         SimpleRead(dst, size);
         return;
     }
 
     Lock();
-
-    if (!m_AllowBlocking) {   // allow blocking?
+    if (!m_DontQueue) {   // allow blocking?
         IssueCommand(0, Command::Code::Read, (int) dst, size);
         goto out;
     }
@@ -123,7 +122,7 @@ void CDFile::Read(void* dst, int size) {
     }
 
     SetPrimaryStatus(3, 7);
-    if (s_Option0) {
+    if (s_NonBlocking) {
         // async
         s_PrimaryCommand = 1;
         s_CurrSectorCount = size / 2048;
@@ -143,7 +142,7 @@ out:
 }
 
 void CDFile::ReadAll(char* fileName) {
-    if (!s_Option0 && !s_Option1) {
+    if (!s_NonBlocking && !s_UseQueue) {
         File::ReadAll(fileName);
         m_Flags |= 0x200;
         SetFlag();
@@ -184,7 +183,7 @@ void CDFile::Func10() {
             file->Func12();
         }
     } else {
-        file->m_AllowBlocking = 1;
+        file->m_DontQueue = 1;
         switch (cmd->m_Code) {
             case Command::Code::Open: {
                 FileAddr* addr = GetFromArray(cmd->m_FileIndex);
@@ -208,7 +207,7 @@ void CDFile::Func10() {
                 file->ReadAll(addr->path);
             } break;
         }
-        file->m_AllowBlocking = 0;
+        file->m_DontQueue = 0;
     }
 
 out:
@@ -218,7 +217,7 @@ out:
 void CDFile::Func11(char* fileName) {
     Lock();
     if (fileName) {
-        if (s_Option0) {
+        if (s_NonBlocking) {
             IssueCommand(GetFileIndex(fileName), Command::Code::ReadAll, 0, 0);
         } else {
             ReadAll(fileName);
@@ -254,13 +253,13 @@ bool CDFile::SetOptions(int option0, int option1, int option2) {
     if (s_PrimaryRunning)
         return false;
 
-    if (option2 == 0 && option0 != s_Option0) {
-        GPU::GetGlobal()->SetCallback(s_Option0 ? nullptr : Callback);
+    if (option2 == 0 && option0 != s_NonBlocking) {
+        GPU::GetGlobal()->SetCallback(s_NonBlocking ? nullptr : Callback);
     }
 
-    s_Option0 = option0;    // no callback
-    s_Option1 = option1;
-    s_Option2 = option2;
+    s_NonBlocking = option0;    // no callback
+    s_UseQueue = option1;
+    s_UseVsync = option2;
     return true;
 }
 
@@ -281,7 +280,7 @@ bool get_allocator_lock();
 // Callback
 void CDFile::Callback() {
     if (s_Lock || get_allocator_lock()) return;
-    if (s_Option2)
+    if (s_UseVsync)
         VSyncCallback(nullptr);
     if (s_PrimaryCommand == 1)
         RunPrimary1();
@@ -291,7 +290,7 @@ void CDFile::Callback() {
         CDFile tmp; // !!! I swear to christ
         tmp.Func10();
     }
-    if (s_Option2)
+    if (s_UseVsync)
         VSyncCallback(Callback);
 }
 
@@ -299,7 +298,7 @@ void CDFile::Callback() {
 void CDFile::StartRunningCommands() {
     Lock();
     if (s_RunningCommands == 0) {
-        if (s_Option2)
+        if (s_UseVsync)
             VSyncCallback(Callback);
         s_RunningCommands = 1;
     }

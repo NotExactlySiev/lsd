@@ -82,8 +82,8 @@ private:
     
     //
     static bool s_ModeSet;
-    static int s_Option0;
-    static int s_Option1;
+    static int s_NonBlocking;
+    static int s_UseQueue;
     static bool s_PrimaryRunning;
     // s_AddrArray
     static int s_CurrIndex;
@@ -100,7 +100,7 @@ private:
     static int s_PrimaryCommand;
     static int s_RunningCommands;
     static int s_PrimaryCounter;
-    static int s_Option2;
+    static int s_UseVsync;
 
 
     // unordered
