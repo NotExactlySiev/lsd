@@ -1,6 +1,8 @@
 {
   description = "Minimal PSX Development Environment";
 
+  # TODO: add my super awesome Nix build of PCSX-Redux
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   };
@@ -16,24 +18,20 @@
         pkgs = import nixpkgs {
           localSystem = { inherit system; };
         };
-        #crossPkgs = import nixpkgs {
-        #  localSystem = { inherit system; };
-        #  crossSystem = { system = "mipsel-none-elf"; };
-        #};
-        crossPkgs = pkgs.pkgsCross.mipsel-linux-gnu;
+        crossPkgs = import nixpkgs {
+          localSystem = { inherit system; };
+          crossSystem = {
+            system = "mipsel-linux";
+            libc = "musl";
+          };
+        };
       in
       {
         default = pkgs.mkShell {
           packages = [
-
-            # crossPkgs.buildPackages.gccWithoutTargetLibc
-            crossPkgs.buildPackages.gcc
-            # crossPkgs.buildPackages.binutils-unwrapped
-          ];
-
-          buildInputs = [
-            pkgs.SDL2
-            pkgs.openal
+            crossPkgs.stdenv.cc.cc
+            #(crossPkgs.stdenvNoLibs.cc.cc.override { langCC = true; })
+            crossPkgs.stdenvNoLibs.cc.bintools.bintools
           ];
         };
       });

@@ -6,7 +6,7 @@ extern "C" {
 #include <libgte.h>
 }
 
-struct Point {
+struct Point2D {
     short x, y;
 
     int What() {
@@ -15,6 +15,9 @@ struct Point {
     }
 };
 
+struct Box {
+    
+};
 
 class Object : public Entity {
 public:
@@ -28,8 +31,8 @@ public:
 
     virtual ~Object();
     /*  0 */ virtual void Init();
-    /*  1 */ virtual void Func1(int set, Point* points);
-    /*  2 */ virtual void Func2(int set, Point* points);
+    /*  1 */ virtual void Func1(int set, Point2D* points);
+    /*  2 */ virtual void Func2(int set, Point2D* points);
     /*  3 */ virtual void Attach(Object* super, VECTOR* offset);
     /*  4 */ virtual void Detach();
     /*  5 */ virtual void DetachChildren();
@@ -45,15 +48,15 @@ public:
     /* 15 */ virtual int SetSubdivision(int val);
     /* 16 */ virtual int SetBackClipping(int val);
     /* 17 */ virtual void MakeRotationMatrix(MATRIX* out, bool flip);
-    /* 18 */
-    /* 19 */
-    /* 20 */
+    /* 18 */ virtual void Func18(int event);    // send event to all colliders?
+    /* 19 */ virtual void CollisionBox(ColBox& col);
+    /* 20 */ virtual void Func20(ColBox& col, int event);
     /* 21 */ virtual void On2Event(Entity* sender, int event);
     /* 22 */ virtual void On5Event(Entity* sender, int event);
     /* 23 */ virtual void OnObjectEvent(Object* sender, int event);
     /* 24 */ virtual void CheckCollision(Object* other);  // I think
-    /* 25 */
-    /* 26 */
+    /* 25 */ virtual void Func25(Point3D* point, Point3D* dst, Point3D* src, int n);
+    /* 26 */ virtual bool Func26(ColBox& col, Point3D& point);
     /* 27 */
     /* 28 */ virtual void DoNothing1();
     /* 29 */
@@ -67,5 +70,7 @@ public:
     Model* m_Model;
     int unk5;
     Object* m_Other;    // collider?
+    int unk7;
+    ColBox* unk8;
     //...
 };

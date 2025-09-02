@@ -146,7 +146,7 @@ void Renderer::DoNothing3() {}
 
 void Renderer::Allocate() {
     if (!m_Allocated) {
-        // TODO: is this formula from libgs?
+        // why this formula?
         size_t workSize = m_PrimBucketSize * m_PrimBucketCount;
         size_t otSize = (1 << m_OtPower) * sizeof(u_long);
         size_t bufferSize = sizeof(GsOT) + otSize + workSize;

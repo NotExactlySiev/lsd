@@ -1,6 +1,12 @@
 #include "object.hh"
 #include "util.hh"
 
+int g_MysteryDone;
+
+int get_mystery_done() {
+    return g_MysteryDone;
+}
+
 Object::Object() : Entity() {
     m_Obj.coord2 = new GsCOORDINATE2;
     m_Obj.coord2->param = new GsCOORD2PARAM;
@@ -209,7 +215,33 @@ void Object::MakeRotationMatrix(MATRIX* out, bool flip) {
     RotMatrix(&rotation, out);
 }
 
-//
+void Object::Func18(int event) {
+    if (event > 3) return;
+    if (event < 2) return;
+    if (m_Model == nullptr) return;
+    if (get_mystery_done() == 0) return;
+
+    ColBox col;
+    CollisionBox(col);
+    //
+    //
+}
+
+void Object::CollisionBox(ColBox& col) {
+    m_Model->UnwrapBoundingBox(col);
+}
+
+void apply_matrix_to_points(Point3D* dst, Point3D* src, int n, MATRIX* mat);
+
+void Object::Func20(ColBox& col, int event) {
+    // project
+    apply_matrix_to_points(col.pts, col.pts, 8 * col.n, &m_Obj.coord2->workm);
+    m_Other = nullptr;
+    unk7 = 0;
+    unk8 = &col;
+    Broadcast(event);
+    unk8 = nullptr;
+}
 
 void Object::On2Event(Entity* sender, int event) {}
 
@@ -223,6 +255,61 @@ void Object::OnObjectEvent(Object* sender, int event) {
             m_Other = sender;
         }
     }
+}
+
+int abs(int x) {
+    return x < 0 ? -x : x;
+}
+
+void Object::CheckCollision(Object* other) {
+    if (m_Model == nullptr) return;
+    if (get_mystery_done() == 0) return;
+    
+    //
+    long* thatT = nullptr;
+    if (other->m_Super) {
+        thatT = other->m_Super->m_Obj.coord2->workm.t;
+    }
+
+    long* thisT = nullptr;
+    if (m_Super) {
+        thisT = m_Super->m_Obj.coord2->workm.t;
+    }
+
+    int diffX = thatT[0] - thisT[0];
+    int diffY = thatT[1] - thisT[1];
+    int diffZ = thatT[2] - thisT[2];
+    if (abs(diffX) > 0x4000) return;
+    if (abs(diffY) > 0x4000) return;
+    if (abs(diffZ) > 0x4000) return;
+    
+    Point3D diff = { diffX, diffY, diffZ };
+    ColBox col;
+    col.n = m_Other->unk8->n;
+    Func25(&diff, col.pts, other->unk8->pts, col.n);    // ???????????
+
+    //
+    //
+    //
+}
+
+void Object::Func25(Point3D* point, Point3D* dst, Point3D* src, int n) {
+    MATRIX m;
+    MakeRotationMatrix(&m, true);
+    for (Object* obj = m_Super; obj; obj = obj->m_Super) {
+        MATRIX sm;
+        obj->MakeRotationMatrix(&sm, true);
+        MulMatrix2(&sm, &m);
+    }
+    apply_matrix_to_points(dst, src, n, &m);
+    if (point) {
+        apply_matrix_to_points(point, point, 1, &m);
+    }
+}
+
+bool Object::Func26(ColBox& col, Point3D& diff) {
+    col.pts[0][0] += diff;
+    //for (
 }
 
 //

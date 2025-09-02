@@ -8,7 +8,7 @@ File::File() : Entity() {
     m_Unk0 = 0;
     m_CmdCount = 0;
     m_Flags = 0;
-    m_DoItNow = 0;
+    m_AllowBlocking = 0;
     m_Unk2 = 0;
 }
 

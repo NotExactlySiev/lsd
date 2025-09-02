@@ -1,5 +1,12 @@
 #include "file.hh"
 
+struct FileAddr {
+    char path[16];
+    //
+    CdlLOC pos;
+    int size;
+};
+
 class CDFile : public File {
 public:
     virtual int Kind() const override { return 0x13; }
@@ -18,8 +25,8 @@ public:
     /*  7 */ virtual void FreeBuffer();
     /*  8 */ virtual void Nothing0();
     /*  9 */ virtual void SetFlag();
-    /* 10 */ virtual void Func10() override;    // static?
-    /* 11 */ virtual void Func11(char* fileName) override;
+    /* 10 */ virtual void Func10() override;
+    /* 11 */ virtual void Func11(char* fileName) override;  // entry point
     /* 12 */ virtual void Func12() override;
     /* 13 */ virtual void Func13() override;
 
@@ -42,7 +49,7 @@ private:
     struct Command {
         // I don't think these two functions were ctor/dtor in the original.
         // but this is neater and basically the same thing.
-        Command();
+        explicit Command();
         ~Command();
 
         int m_Active;
@@ -60,7 +67,7 @@ private:
     //
     //
     //
-    static void StartRunning();
+    static void StartRunningCommands();
     void IssueCommand(int fileIndex, int cmd, int arg0, int arg1);
 
     
@@ -68,33 +75,33 @@ private:
     static bool s_ModeSet;
     static int s_Option0;
     static int s_Option1;
-    static bool s_SomeCheck;
-    // s_FilesArray
+    static bool s_PrimaryRunning;
+    // s_AddrArray
     static int s_CurrIndex;
     static int s_LetSecondaryEnd;
     static int s_Unused0;
     static int s_PrimaryStep;
-    // curr file from array
+    static FileAddr* s_CurrAddr;
     static int s_CurrSectorCount;
     static void* s_CurrBuffer;
-    //
+    static FileAddr* s_NextAddr;
     static bool s_Lock;
     static int s_RunningQueue;
     static Command* s_Queue;
     static int s_PrimaryCommand;
-    static int s_Unused1;
+    static int s_RunningCommands;
     static int s_PrimaryCounter;
     static int s_Option2;
 
 
     // unordered
-    // GetFile
+    static FileAddr* GetFile(char*);
     static int GetFileIndex(char*);
-    // GetFile
-    // GetFile
+    static FileAddr* GetFromArray(int);
     static void RunPrimary1();
     static void RunPrimary2();
     static void SetPrimaryStatus(int, int);
-    static void StopAll();
-    static void SetPrimaryState(int, int);    
+    static void StopAll();  // call when successfully completed primary?
+    static void SetPrimaryStep(int);
+    
 };

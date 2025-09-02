@@ -24,6 +24,8 @@ SOFTWARE.
 
 */
 
+.set SBUS_DEV8_CTRL,      0x1f80101C
+
     .section .start, "ax", @progbits
     .set noreorder
     .align 2
@@ -60,3 +62,11 @@ _bss_init_skip:
     la    $a1, _mainargv
     j     main
     li    $a0, 1
+
+    .section .rodata, "a", @progbits
+    .align 2
+_mainargv:
+    .word _progname
+    .word 0
+_progname:
+    .string "PSX.EXE"

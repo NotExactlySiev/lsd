@@ -31,7 +31,7 @@ public:
     /*  8 */ virtual void DoNothing0();
     /*  9 */ virtual void SetFlag();
     /* 10 */ virtual void Func10() = 0;
-    /* 11 */ virtual void Func11(char* fileName) = 0;
+    /* 11 */ virtual void Func11(char* fileName) = 0;   // entry point
     /* 12 */ virtual void Func12() = 0;
     /* 13 */ virtual void Func13() = 0;
 
@@ -52,7 +52,7 @@ protected:
     short m_Unk0;
     short m_CmdCount;
     int m_Flags;
-    short m_DoItNow;
+    short m_AllowBlocking;    // async, for this file only
     short m_Unk2;   // padding?
 
 private:

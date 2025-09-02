@@ -182,7 +182,8 @@ SECTIONS {
     . = ALIGN(4);
     __bss_end = .;
 
-    __heap_start = __bss_end;
+    /* who needs a heap :P */
+    /*__heap_start = __heap_base;*/
 
     . = ADDR(.text) - 0x800;
     __end = .;
