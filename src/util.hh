@@ -1,5 +1,6 @@
 #pragma once
 extern "C" {
+#include <libgte.h>
 #include <libgpu.h>
 }
 // This struct is sometimes read from as if x and y are u16. why?
@@ -13,7 +14,7 @@ struct Area2D {
 };
 
 // TODO: maybe this originally returned RECT as value?
-void Area2DToRECT(RECT* dst, Area2D* src);
+//void Area2DToRECT(RECT* dst, Area2D* src);
 unsigned long SetBitfield(unsigned long& bitfield, uint position, uint length, uint value);
 
 struct Color {

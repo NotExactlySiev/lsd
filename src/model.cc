@@ -1,5 +1,12 @@
 #include "model.hh"
 
+Model::Model(ulong* tmdData) : Entity() {
+    m_Data = tmdData;
+    m_Header = tmdData - 3;
+    //set_mystery_done();
+    //
+}
+
 void Model::FindBoundingBox(Box& box) {
     SVECTOR* verts = *static_cast<SVECTOR**>(m_Data);
     uint n = *static_cast<uint*>(m_Data + 4);

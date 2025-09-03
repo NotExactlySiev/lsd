@@ -26,12 +26,24 @@
           };
         };
       in
-      {
-        default = pkgs.mkShell {
+      with pkgs; {
+        default = mkShell {
           packages = [
-            crossPkgs.stdenv.cc.cc
+            #crossPkgs.stdenv.cc.cc
             #(crossPkgs.stdenvNoLibs.cc.cc.override { langCC = true; })
-            crossPkgs.stdenvNoLibs.cc.bintools.bintools
+            #crossPkgs.stdenvNoLibs.cc.bintools.bintools
+          ];
+
+          buildInputs = [
+            SDL2
+            openal
+          ];
+
+          nativeBuildInputs = [
+            meson
+            ninja
+            cmake
+            pkg-config
           ];
         };
       });

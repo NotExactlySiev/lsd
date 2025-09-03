@@ -39,8 +39,19 @@ public:
     void FindBoundingBox(Box& box);
     void UnwrapBoundingBox(ColBox& col);
 
-
+    static int s_FirstModelLoaded;
+    
 public:
+    Model(ulong* tmdData);
+
+    /*  0 */ virtual void SetVector();
+    /*  1 */ virtual void MapModelingData();
+    /*  2 */ virtual void GetModelRawData();
+    /*  3 */ virtual void Nothing();
+
+    static void SetFirstModelLoaded();
+    static int IsFirstModelLoaded();
+
     void* m_Header; // is this correct in the original game?
     void* m_Data;
     VECTOR m_Vec;

@@ -77,7 +77,7 @@ private:
     //
     //
     static void StartRunningCommands();
-    void IssueCommand(int fileIndex, Command::Code cmd, int arg0, int arg1);
+    void EnqueueCommand(int fileIndex, Command::Code cmd, int arg0, int arg1);
 
     
     //

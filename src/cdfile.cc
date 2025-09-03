@@ -80,7 +80,7 @@ void CDFile::Open(char* filename, int arg0, int arg1) {
             }
         }
     } else {
-        IssueCommand(GetFileIndex(filename), Command::Code::Open, arg0, arg1);
+        EnqueueCommand(GetFileIndex(filename), Command::Code::Open, arg0, arg1);
     }
     Unlock();
 }
@@ -92,12 +92,12 @@ void CDFile::Close() {
     }
 
     Lock();
-    if (!m_DontQueue) {
-        IssueCommand(0, Command::Code::Close, 0, 0);
-    } else if (!s_PrimaryRunning) {
+    if (m_DontQueue) {
         SetPrimaryStatus(0, 0);
         m_Open = false;
         StopAll();
+    } else if (!s_PrimaryRunning) {
+        EnqueueCommand(0, Command::Code::Close, 0, 0);
     }
     Unlock();
 }
@@ -112,32 +112,28 @@ void CDFile::Read(void* dst, int size) {
     }
 
     Lock();
-    if (!m_DontQueue) {   // allow blocking?
-        IssueCommand(0, Command::Code::Read, (int) dst, size);
-        goto out;
-    }
-
-    if (s_PrimaryRunning || !m_Open) {
-        goto out;
-    }
-
-    SetPrimaryStatus(3, 7);
-    if (s_NonBlocking) {
-        // async
-        s_PrimaryCommand = 1;
-        s_CurrSectorCount = size / 2048;
-        s_CurrBuffer = dst;
-        //
+    if (m_DontQueue) {
+        if (!s_PrimaryRunning && m_Open) {
+            SetPrimaryStatus(3, 7);
+            if (s_NonBlocking) {
+                // async
+                s_PrimaryCommand = 1;
+                s_CurrSectorCount = size / 2048;
+                s_CurrBuffer = dst;
+                //
+            } else {
+                // block
+                CdRead(size / 2048, (u_long*) dst, CdlModeSpeed);
+                int rc;
+                do {
+                    while ((rc = CdReadSync(0, nullptr)) > 0);
+                } while (rc == -1);
+                StopAll();
+            }
+        }
     } else {
-        // block
-        CdRead(size / 2048, (u_long*) dst, CdlModeSpeed);
-        int rc;
-        do {
-            while ((rc = CdReadSync(0, nullptr)) > 0);
-        } while (rc == -1);
-        StopAll();
+        EnqueueCommand(0, Command::Code::Read, (int) dst, size);
     }
-out:
     Unlock();
 }
 
@@ -149,7 +145,6 @@ void CDFile::ReadAll(char* fileName) {
     } else {
         //
     }
-
 }
 
 //
@@ -218,7 +213,7 @@ void CDFile::Func11(char* fileName) {
     Lock();
     if (fileName) {
         if (s_NonBlocking) {
-            IssueCommand(GetFileIndex(fileName), Command::Code::ReadAll, 0, 0);
+            EnqueueCommand(GetFileIndex(fileName), Command::Code::ReadAll, 0, 0);
         } else {
             ReadAll(fileName);
             if (m_CmdCount == 0) {
@@ -249,17 +244,17 @@ void CDFile::SetFastMode() {
     }
 }
 
-bool CDFile::SetOptions(int option0, int option1, int option2) {
+bool CDFile::SetOptions(int nonBlocking, int useQueue, int useVsync) {
     if (s_PrimaryRunning)
         return false;
 
-    if (option2 == 0 && option0 != s_NonBlocking) {
+    if (useVsync == 0 && nonBlocking != s_NonBlocking) {
         GPU::GetGlobal()->SetCallback(s_NonBlocking ? nullptr : Callback);
     }
 
-    s_NonBlocking = option0;    // no callback
-    s_UseQueue = option1;
-    s_UseVsync = option2;
+    s_NonBlocking = nonBlocking;
+    s_UseQueue = useQueue;
+    s_UseVsync = useVsync;
     return true;
 }
 
@@ -309,7 +304,7 @@ void CDFile::StartRunningCommands() {
 // StopRunning
 
 // enqueue
-void CDFile::IssueCommand(int fileIndex, Command::Code code, int arg0, int arg1) {
+void CDFile::EnqueueCommand(int fileIndex, Command::Code code, int arg0, int arg1) {
     Command* command = new Command;
     command->m_Code = code;
     command->m_Unk1 = arg0;
@@ -460,10 +455,8 @@ out:
 }
 
 /*
-    
-    void CDFile::SetPrimaryStatus(int, int)
-    void CDFile::StopAll()
-    
+void CDFile::SetPrimaryStatus(int, int)
+void CDFile::StopAll()
 */
 
 void CDFile::SetPrimaryStep(int val) {
